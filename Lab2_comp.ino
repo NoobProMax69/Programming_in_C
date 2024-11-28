@@ -7,31 +7,28 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-// Set CPU clock to 16MHz
 #define F_CPU 16000000
 
-// Function prototype
 void display_statuses_and_results(uint8_t stat);
 
 int main(void) {
-    // Set PORTD as output for statuses (bits 0-3) and conditions (bits 4-7)
-    DDRD = 0xFF; // Set all 8 bits of PORTD as output
+    DDRD = 0xFF; // Set all PORTD pins as outputs
 
     while (1) {
-        // First test case
+        // Test case 1
         uint8_t stat = 0B01101101;
         display_statuses_and_results(stat);
-        _delay_ms(12000); // Delay 12 seconds
+        _delay_ms(12000);
 
-        // Second test case
+        // Test case 2
         stat = 0B01010111;
         display_statuses_and_results(stat);
-        _delay_ms(12000); // Delay 12 seconds
+        _delay_ms(12000);
 
-        // Third test case
+        // Test case 3
         stat = 0B00000000;
         display_statuses_and_results(stat);
-        _delay_ms(12000); // Delay 12 seconds
+        _delay_ms(12000);
     }
 }
 
@@ -41,35 +38,37 @@ int main(void) {
 * @return nothing
 */
 void display_statuses_and_results(uint8_t stat) {
-    uint8_t brake_pad = stat & 0x01;       // Bit 0
+    // Extract the individual statuses from the stat variable
+    uint8_t brake_pad = stat & 0x01;         // Bit 0
     uint8_t brake_fluid = (stat & 0x02) >> 1; // Bit 1
     uint8_t engine_temp = (stat & 0x04) >> 2; // Bit 2
     uint8_t oil_level = (stat & 0x08) >> 3;   // Bit 3
 
-    // Display statuses on LEDs connected to bits 0–3
-    PORTD = (stat & 0x0F); // Copy bits 0-3 directly to LEDs 0-3
+    // Display statuses on LEDs 0–3
+    PORTD = (stat & 0x0F); // Directly assign lower 4 bits to LEDs 0–3
 
-    // Clear condition LEDs (bits 4–7)
-    PORTD &= 0x0F;
-
-    // Evaluate conditions and map them to LEDs 4–7
-    // Condition 0: Everything in the car is working normally
+    // Evaluate and set condition LEDs (4–7) individually
     if ((stat & 0x0F) == 0) {
-        PORTD |= (1 << 4); // Turn on LED 4
+        PORTD |= (1 << 4); // All systems normal -> LED 4 ON
+    } else {
+        PORTD &= ~(1 << 4); // All systems not normal -> LED 4 OFF
     }
 
-    // Condition 1: Engine is too hot
     if (engine_temp == 1) {
-        PORTD |= (1 << 5); // Turn on LED 5
+        PORTD |= (1 << 5); // Engine too hot -> LED 5 ON
+    } else {
+        PORTD &= ~(1 << 5); // Engine normal -> LED 5 OFF
     }
 
-    // Condition 2: Engine oil is too low AND engine is too hot
     if (oil_level == 1 && engine_temp == 1) {
-        PORTD |= (1 << 6); // Turn on LED 6
+        PORTD |= (1 << 6); // Oil low and engine too hot -> LED 6 ON
+    } else {
+        PORTD &= ~(1 << 6); // Condition not met -> LED 6 OFF
     }
 
-    // Condition 3: Brake fluid is too low OR brake pads are bad
     if (brake_fluid == 1 || brake_pad == 1) {
-        PORTD |= (1 << 7); // Turn on LED 7
+        PORTD |= (1 << 7); // Brake fluid low or pads bad -> LED 7 ON
+    } else {
+        PORTD &= ~(1 << 7); // Condition not met -> LED 7 OFF
     }
 }
