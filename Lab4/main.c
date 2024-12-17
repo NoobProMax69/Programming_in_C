@@ -1,29 +1,20 @@
-// main.c
-
 #include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 #include "cai_functions.h"
 
 int main() {
     char name[50];
     int choice;
 
-    // Initialize random number generator
-    srand(time(NULL));
-
-    // Get user name
     get_user_name(name);
 
     while (1) {
-        // Display the main menu
         printf("\nYou can choose:\n");
         printf("1. Do a practice\n");
         printf("2. Complete a test\n");
         printf("3. Quit the program\n");
         choice = get_choice(3);
 
-        if (choice == 1) {  // Practice mode
+        if (choice == 1) {
             printf("\nNow, you can choose to do practices on:\n");
             printf("1. Additions\n");
             printf("2. Subtractions\n");

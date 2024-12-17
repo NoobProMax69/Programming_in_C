@@ -3,6 +3,9 @@ project(Lab4 C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(Lab4 main.c
-        cai_functions.h
-        cai_functions.c)
+include_directories(.)
+
+add_executable(Lab4
+    cai_functions.c
+    cai_functions.h
+    main.c)
